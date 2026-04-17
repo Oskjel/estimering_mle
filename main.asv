@@ -5,34 +5,17 @@ w = complex(zeros(N, length(SNR_dB)));
 % Generating FFT
 fft_list = cell(length(M), 1);
 
-% Generating signal
+% Generating X 
 for j = 1:length(SNR) % Number of different Signal-to-Noise ratios
     w(:,j) = mu_w + sigma_w(j) * (randn(1, N)+ 1i*randn(N,1)) / sqrt(2);
-    x(:,j) = A * exp(1i * (w0*n*tan + phi)) + w(:, j);
+    x(:,j) = A * exp(1i * (w0*n*T + phi)) + w(:, j);
  
 end
-
-
-
-for n = 1:length(M)
-    fft_list(n) = fft(x, M(n));
+% FFT for each all signals and FFT-lengths
+for j = 1:length(SNR)
+    for k = 1:length(M)
+        fft_list{j,k} = fft(x(:,j), M(k)) % funct
+    end
 end
-
-% Plot FFT
-figure;
-hold on;
-
-for k = 1:length(M)
-    X = fft_list{k};
-    f = (0:M(k)-1)/M(k);   % normalized frequency
-    
-    plot(f, abs(X));
-end
-
-legend("M=" + string(M));
-xlabel('Normalized Frequency');
-ylabel('|X(f)|');
-title('FFT Magnitude for Different M');
-hold off;
 
 
