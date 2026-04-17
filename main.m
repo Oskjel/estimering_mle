@@ -6,36 +6,40 @@ w = complex(zeros(N, length(SNR_dB)));
 fft_list = cell(length(SNR_dB), length(M));
 
 % Allocating space for estimators
-omega_hat = zeros(length(SNR_dB), length(M));
-phi_hat   = zeros(length(SNR_dB), length(M));
+w_hat = zeros(length(SNR_dB), length(M));
+phi_hat = zeros(length(SNR_dB), length(M));
 
-% Generating X 
-for j = 1:length(SNR) % Number of different Signal-to-Noise ratios
-    w(:,j) = mu_w + sigma_w(j) * (randn(N,1) + 1i*randn(N,1)) / sqrt(2);
-    x(:,j) = A * exp(1i * (w_0*n*T + phi)) + w(:, j);
-end
-
-% FFT for all signals and FFT-lengths
-for j = 1:length(SNR_dB)
-    for k = 1:length(M)
-        FFT_X = fft(x(:,j), M(k));% fft in matlab takes care of zero padding
-        fft_list{j,k} = FFT_X;
-
-        % FFT-based frequency estimate
-        [~, m_star] = max(abs(FFT_X));
-        m_star = m_star-1; %index correction
-        omega_hat(j, k) = (2*pi*m_star)/(M(k)*T);
-        
-        % FFT-based phase estimate
-        F_omega_hat = 1/N * sum(x(:,j) .* exp(-1i*omega_hat(j,k) *n*T));
-        phi_hat(j,k) = angle(F_omega_hat);
-
+for mc = 1:Nmc
+    % Generating X 
+    for j = 1:length(SNR) % Number of different Signal-to-Noise ratios
+        w(:,j) = mu_w + sigma_w(j) * (randn(N,1) + 1i*randn(N,1)) / sqrt(2);
+        x(:,j) = A * exp(1i * (w_0*n*T + phi)) + w(:, j);
+    end
+    
+    % FFT for all signals and FFT-lengths
+    for j = 1:length(SNR_dB)
+        for k = 1:length(M)
+            FFT_X = fft(x(:,j), M(k));% fft in matlab takes care of zero padding
+            fft_list{j,k} = FFT_X;
+    
+            % FFT-based frequency estimate
+            [~, m_star] = max(abs(FFT_X));
+            m_star = m_star-1; %index correction
+            w_hat(j, k) = (2*pi*m_star)/(M(k)*T);
+            
+            % FFT-based phase estimate
+            F_w_hat = 1/N * sum(x(:,j) .* exp(-1i*w_hat(j,k) *n*T));
+            phi_hat(j,k) = angle(exp(-1i*w_hat(j,k)*n_0*T) * F_w_hat);
+        end
     end
 end
 
+% Finding estimator error variances
+e_w = w_0 - w_hat;
+e_phi = angle(exp(1i * (phi - phi_hat)));
 
-
-
+var_e_w = var(e_w);
+var_e_phi = var(e_phi);
 
 
 % Plot FFT
