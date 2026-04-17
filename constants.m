@@ -5,8 +5,8 @@ T = 10^(-6);
 
 % Sampling parameters
 N = 513;
-n0 = -256;
-n = (n0:n0+N-1).'; 
+n_0 = -256;
+n = (n_0:n_0+N-1).'; 
 
 % Signal frequency, phase and amplitude
 f_0 = 10^5;
@@ -22,9 +22,11 @@ SNR = 10.^(SNR_dB/10);
 mu_w = 0;
 sigma_w = sqrt((0.5 * A^2) ./ SNR);
 
-% CRLB helper constants
+% CRLB
 P = N * (N-1) / 2;
 Q = N * (N-1) * (2*N-1) / 6;
+CRLB_w = 12 * sigma_w.^2 / (A^2*T^2*N*(N^2 - 1));
+CRLB_phi = 12 * sigma_w.^2 * (n_0^2*N + 2*n_0*P + Q) / (A^2*N^2*(N^2 - 1));
 
 % FFT size
 k = [10 12 14 16 18 20];
