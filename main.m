@@ -3,7 +3,11 @@ x = complex(zeros(N, length(SNR_dB)));
 w = complex(zeros(N, length(SNR_dB)));
 
 % Generating FFT
-fft_list = cell(length(M), 1);
+fft_list = cell(length(SNR_dB), length(M));
+
+% Allocating space for estimators
+omega_hat = zeros(length(SNR_dB), length(M));
+phi_hat   = zeros(length(SNR_dB), length(M));
 
 % Generating X 
 for j = 1:length(SNR) % Number of different Signal-to-Noise ratios
@@ -12,11 +16,26 @@ for j = 1:length(SNR) % Number of different Signal-to-Noise ratios
 end
 
 % FFT for all signals and FFT-lengths
-for j = 1:length(SNR)
+for j = 1:length(SNR_dB)
     for k = 1:length(M)
-        fft_list{j,k} = fft(x(:,j), M(k));% fft in matlab takes care of zero padding
+        FFT_X = fft(x(:,j), M(k));% fft in matlab takes care of zero padding
+        fft_list{j,k} = FFT_X;
+
+        % FFT-based frequency estimate
+        [~, m_star] = max(abs(FFT_X));
+        m_star = m_star-1; %index correction
+        omega_hat(j, k) = (2*pi*m_star)/(M(k)*T);
+        
+        % FFT-based phase estimate
+        F_omega_hat = 1/N * sum(x(:,j) .* exp(-1i*omega_hat(j,k) *n*T));
+        phi_hat(j,k) = angle(F_omega_hat);
+
     end
 end
+
+
+
+
 
 
 % Plot FFT
