@@ -8,6 +8,7 @@ N = 513;
 n_0 = -256;
 n = (n_0:n_0+N-1).';
 N_realizations = 10;
+n_loc = (0:N-1).';
 
 % Signal frequency, phase and amplitude
 f_0 = 10^5;

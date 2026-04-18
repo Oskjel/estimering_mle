@@ -32,7 +32,7 @@ for r = 1:N_realizations
             w_hat(j, k) = (2*pi*m_star)/(M(k)*T);
             
             % FFT-based phase estimate
-            F_w_hat = 1/N * sum(x(:,j) .* exp(-1i*w_hat(j,k) *n*T));
+            F_w_hat = 1/N * sum(x(:,j) .* exp(-1i*w_hat(j,k) *n_loc*T));
             phi_hat(j,k) = angle(exp(-1i*w_hat(j,k)*n_0*T) * F_w_hat);
 
             % Finding estimator error
