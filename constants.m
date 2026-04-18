@@ -3,11 +3,11 @@
 F_s = 10^6;
 T = 10^(-6);
 
-% Sampling parameters
+% Sampling and simulation parameters
 N = 513;
 n_0 = -256;
 n = (n_0:n_0+N-1).';
-N_realizations = 10;
+N_realizations = 500;
 n_loc = (0:N-1).';
 
 % Signal frequency, phase and amplitude
@@ -16,7 +16,7 @@ w_0 = 2*pi*f_0;
 phi = pi/8;
 A = 1;
 
-% SNR_dB to snr
+% SNR_dB to SNR
 SNR_dB = [-10 0 10 20 30 40 50 60];
 SNR = 10.^(SNR_dB/10);
 
