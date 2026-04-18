@@ -42,11 +42,41 @@ for r = 1:N_realizations
     end
 end
 
-% Finding estimator error variance and bias
-bias_e_w = squeeze(mean(e_w_list, 1));
-var_e_w  = squeeze(var(e_w_list, 0, 1));
-mse_e_w  = squeeze(mean(e_w_list.^2, 1));
+% Finding estimator error variance
+var_e_w   = squeeze(var(e_w_list, 0, 1));
+var_e_phi = squeeze(var(e_phi_list, 0, 1));
 
-bias_e_phi = squeeze(mean(e_phi_list, 1));
-var_e_phi  = squeeze(var(e_phi_list, 0, 1));
-mse_e_phi  = squeeze(mean(e_phi_list.^2, 1));
+
+% Plotting FFT based frequency estimator variance against CRLB
+figure;
+hold on;
+grid on;
+
+for k = 1:length(M)
+    semilogy(SNR_dB, var_e_w(:,k), 'o-', 'LineWidth', 1.2);
+end
+
+semilogy(SNR_dB, CRLB_w, 'k--', 'LineWidth', 2);
+
+xlabel('SNR (dB)');
+ylabel('Variance of frequency error');
+title('FFT-based frequency estimator variance vs CRLB');
+legend([compose('M = 2^{%d}', 10:2:20), "CRLB"], 'Location', 'southwest');
+hold off;
+
+% Plotting FFT based phase estimator variance against CRLB
+figure;
+hold on;
+grid on;
+
+for k = 1:length(M)
+    semilogy(SNR_dB, var_e_phi(:,k), 'o-', 'LineWidth', 1.2);
+end
+
+semilogy(SNR_dB, CRLB_phi, 'k--', 'LineWidth', 2);
+
+xlabel('SNR (dB)');
+ylabel('Variance of phase error');
+title('FFT-based phase estimator variance vs CRLB');
+legend([compose('M = 2^{%d}', 10:2:20), "CRLB"], 'Location', 'southwest');
+hold off;
