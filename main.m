@@ -16,7 +16,7 @@ e_phi_list = zeros(N_realizations, length(SNR_dB), length(M));
 for r = 1:N_realizations
     % Generating signal 
     for j = 1:length(SNR) % Number of different Signal-to-Noise ratios
-        w(:,j) = mu_w + sigma_w(j) * (randn(N,1) + 1i*randn(N,1)) / sqrt(2);
+        w(:,j) = mu_w + sigma_w(j) * (randn(N,1) + 1i*randn(N,1));
         x(:,j) = A * exp(1i * (w_0*n*T + phi)) + w(:, j);
     end
     
@@ -46,4 +46,20 @@ end
 var_e_w   = squeeze(var(e_w_list, 0, 1));
 var_e_phi = squeeze(var(e_phi_list, 0, 1));
 
+% Plotting FFT based estimator variance against CRLB
+figure;
+hold on;
+grid on;
+
+for k = 1:length(M)
+    semilogy(SNR_dB, var_e_w(:,k), 'o-', 'LineWidth', 1.2);
+end
+
+semilogy(SNR_dB, CRLB_w, 'k--', 'LineWidth', 2);
+
+xlabel('SNR (dB)');
+ylabel('Variance of frequency error');
+title('FFT-based frequency estimator variance vs CRLB');
+legend([compose('M = 2^{%d}', 10:2:20), "CRLB"], 'Location', 'southwest');
+hold off;
 
