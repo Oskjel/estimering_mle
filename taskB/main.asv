@@ -27,7 +27,7 @@ for r = 1:N_realizations
             fft_list{j,k} = FFT_X;
     
             % FFT-based frequency estimate
-            [~, m_star] = max(abs(FFT_X));
+            [~, m_star] = fminsearch(-abs(FFT_X));
             m_star = m_star-1; %index correction
             w_hat(j, k) = (2*pi*m_star)/(M(k)*T);
             
@@ -39,6 +39,28 @@ for r = 1:N_realizations
             e_w_list(r, j, k)   = w_0 - w_hat(j,k);
             e_phi_list(r, j, k) = angle(exp(1i * (phi - phi_hat(j,k))));
         end
+    end
+end
+
+for r = 1:N_realizations
+    for j = 1:length(SNR_dB)
+        w(:,j) = mu_w + sigma_w(j) * (randn(N,1) + 1i*randn(N,1));
+        x(:,j) = A * exp(1i*(w_0*n*T + phi)) + w(:,j);
+
+        % Coarse FFT estimate
+        FFT_X = fft(x(:,j), M);
+        [~, m_star] = max(abs(FFT_X));
+        m_star = m_star - 1;
+        w_init_guess = (2*pi*m_star)/(M*T);
+
+        % Refine by maximizing |F(omega)| <=> minimizing -|F(omega)|
+        object_func = @(w) -abs((1/N) * sum(x(:,j) .* exp(-1i*w*n_loc*T)));
+        options = optimset('Display','off');
+        w_hat(r,j) = fminsearch(objfun, omega_init, options);
+
+        % Phase estimate
+        F_w_hat = (1/N) * sum(x(:,j) .* exp(-1i*w_hat(r,j)*n_loc*T));
+        phi_hat(r,j) = angle(exp(-1i*w_hat(r,j)*n_0*T) * F_w_hat);
     end
 end
 
